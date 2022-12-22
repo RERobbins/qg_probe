@@ -43,7 +43,7 @@ class Probe:
 
         returns a prediction string
 
-    retrieve_tokenizer (base_model='bart')
+    retrieve_tokenizer (base_model='T5')
 
         returns and caches a tokenizer
 
