@@ -28,8 +28,6 @@ class Probe:
 
     Attributes
     ----------
-    model_root : str
-        the pathname for the root of the model collection
     models : dict
         a dictionary of cached models
     tokenizers : dict
@@ -47,13 +45,12 @@ class Probe:
 
         returns and caches a tokenizer
 
-    retrieve_model(base_model='bart', training_dataset='amalgam')
+    retrieve_model(base_model='T5', training_dataset='amalgam')
 
         returns and caches a model
     """
-
-    def __init__(self, model_root):
-        self.model_root = model_root
+   
+    def __init__(self):
         self.models = {}
         self.tokenizers = {}
 
@@ -118,18 +115,17 @@ class Probe:
         if model:
             return model
 
-        model_dir = f"{self.model_root}{base_model}_base_pt_long.{training_dataset}"
-
+        hf_model = f"RERobbins/qg_{base_model}_{training_dataset}"
+        print(f"Loading: {hf_model} from HuggingFace")
         if base_model == "bart":
-            print(f"Loading: {model_dir}")
-            model = BartForConditionalGeneration.from_pretrained(model_dir)
+            model = BartForConditionalGeneration.from_pretrained(hf_model)
         elif base_model == "T5":
-            print(f"Loading: {model_dir}")
-            model = T5ForConditionalGeneration.from_pretrained(model_dir)
+            model = T5ForConditionalGeneration.from_pretrained(hf_model)
         else:
             raise ValueError("invalid base model")
 
-        model.to(torch.device("cuda:0"))
+        device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")    
+        model.to(device)
         self.models[model_tuple] = model
         return model
 
